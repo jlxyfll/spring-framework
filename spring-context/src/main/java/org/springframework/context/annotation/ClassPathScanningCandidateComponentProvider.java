@@ -94,9 +94,9 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 
 	private String resourcePattern = DEFAULT_RESOURCE_PATTERN;
 
-	private final List<TypeFilter> includeFilters = new ArrayList<>();
+	private final List<TypeFilter> includeFilters = new ArrayList<>();// 要包含的注解，这其中的注解才会被扫描,即Spring默认的@Component、@Repository、@Service、@Controller注解的Bean，
 
-	private final List<TypeFilter> excludeFilters = new ArrayList<>();
+	private final List<TypeFilter> excludeFilters = new ArrayList<>();// 要排除的注解，不会被扫描
 
 	@Nullable
 	private Environment environment;
@@ -143,7 +143,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 * @see #registerDefaultFilters()
 	 */
 	public ClassPathScanningCandidateComponentProvider(boolean useDefaultFilters, Environment environment) {
-		if (useDefaultFilters) {
+		if (useDefaultFilters) {// 如果使用Spring默认的过滤规则，则向容器注册过滤规则
 			registerDefaultFilters();
 		}
 		setEnvironment(environment);
@@ -201,12 +201,15 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 * <p>Also supports Java EE 6's {@link javax.annotation.ManagedBean} and
 	 * JSR-330's {@link javax.inject.Named} annotations, if available.
 	 *
+	 * 为@Component注册默认过滤器。
+	 * 这将隐式注册所有具有@Component元注释的注释，包括@Repository 、 @Service和@Controller原型注释。
+	 * 如果可用，还支持 Java EE 6 的javax.annotation.ManagedBean和 JSR-330 的javax.inject.Named注释
 	 */
 	@SuppressWarnings("unchecked")
 	protected void registerDefaultFilters() {
-		this.includeFilters.add(new AnnotationTypeFilter(Component.class));
-		ClassLoader cl = ClassPathScanningCandidateComponentProvider.class.getClassLoader();
-		try {
+		this.includeFilters.add(new AnnotationTypeFilter(Component.class));// 向要包含的过滤规则中添加@Component注解类 @Service和@Controller都是Component，因为这些注解都添加了@Component注解
+		ClassLoader cl = ClassPathScanningCandidateComponentProvider.class.getClassLoader();// 获取当前类加载器
+		try {// 向要包含的过滤规则添加JavaEE6的@ManagedBean注解
 			this.includeFilters.add(new AnnotationTypeFilter(
 					((Class<? extends Annotation>) ClassUtils.forName("javax.annotation.ManagedBean", cl)), false));
 			logger.trace("JSR-250 'javax.annotation.ManagedBean' found and supported for component scanning");
@@ -214,7 +217,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 		catch (ClassNotFoundException ex) {
 			// JSR-250 1.1 API (as included in Java EE 6) not available - simply skip.
 		}
-		try {
+		try {// 向要包含的过滤规则添加@Named注解
 			this.includeFilters.add(new AnnotationTypeFilter(
 					((Class<? extends Annotation>) ClassUtils.forName("javax.inject.Named", cl)), false));
 			logger.trace("JSR-330 'javax.inject.Named' annotation found and supported for component scanning");
@@ -371,7 +374,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	}
 
 	private Set<BeanDefinition> addCandidateComponentsFromIndex(CandidateComponentsIndex index, String basePackage) {
-		Set<BeanDefinition> candidates = new LinkedHashSet<>();
+		Set<BeanDefinition> candidates = new LinkedHashSet<>();// 创建存储扫描到的类的集合
 		try {
 			Set<String> types = new HashSet<>();
 			for (TypeFilter filter : this.includeFilters) {
@@ -383,9 +386,9 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 			}
 			boolean traceEnabled = logger.isTraceEnabled();
 			boolean debugEnabled = logger.isDebugEnabled();
-			for (String type : types) {
+			for (String type : types) {// 为指定资源获取元数据读取器，元信息读取器通过汇编(ASM)读//取资源元信息
 				MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(type);
-				if (isCandidateComponent(metadataReader)) {
+				if (isCandidateComponent(metadataReader)) {// 如果扫描到的类符合容器配置的过滤规则
 					ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
 					sbd.setSource(metadataReader.getResource());
 					if (isCandidateComponent(sbd)) {
@@ -484,13 +487,13 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 * @param metadataReader the ASM ClassReader for the class
 	 * @return whether the class qualifies as a candidate component
 	 */
-	protected boolean isCandidateComponent(MetadataReader metadataReader) throws IOException {
-		for (TypeFilter tf : this.excludeFilters) {
+	protected boolean isCandidateComponent(MetadataReader metadataReader) throws IOException {// 判断元信息读取器读取的类是否符合容器定义的注解过滤规则
+		for (TypeFilter tf : this.excludeFilters) {// 如果读取的类的注解在排除注解过滤规则中，返回false
 			if (tf.match(metadataReader, getMetadataReaderFactory())) {
 				return false;
 			}
 		}
-		for (TypeFilter tf : this.includeFilters) {
+		for (TypeFilter tf : this.includeFilters) {// 如果读取的类的注解在包含的注解的过滤规则中，则返回ture
 			if (tf.match(metadataReader, getMetadataReaderFactory())) {
 				return isConditionMatch(metadataReader);
 			}

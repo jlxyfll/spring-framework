@@ -44,6 +44,7 @@ import org.springframework.util.Assert;
  *
  * <p>See {@link Configuration @Configuration}'s javadoc for usage examples.
  *
+ * <p>在多个@Configuration类的情况下，后面的类中定义的@Bean方法将覆盖早期类中定义的方法。这可以用来通过额外的@Configuration类故意覆盖某些 bean 定义。
  * @author Juergen Hoeller
  * @author Chris Beams
  * @since 3.0
@@ -55,9 +56,9 @@ import org.springframework.util.Assert;
  */
 public class AnnotationConfigApplicationContext extends GenericApplicationContext implements AnnotationConfigRegistry {
 
-	private final AnnotatedBeanDefinitionReader reader;
+	private final AnnotatedBeanDefinitionReader reader;// 保存一个读取注解的Bean定义读取器，并将其设置到容器中
 
-	private final ClassPathBeanDefinitionScanner scanner;
+	private final ClassPathBeanDefinitionScanner scanner;// 保存一个扫描指定类路径中注解Bean定义的扫描器，并将其设置到容器中
 
 
 	/**
@@ -87,10 +88,10 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * @param componentClasses one or more component classes &mdash; for example,
 	 * {@link Configuration @Configuration} classes
 	 */
-	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
+	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {// 最常用的构造函数，通过将涉及到的配置类传递给该构造函数，以实现将相应配置类中的Bean自动注册到容器中
 		this();
 		register(componentClasses);
-		refresh();
+		refresh();// 刷新
 	}
 
 	/**

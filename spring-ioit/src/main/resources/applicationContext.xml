@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<!--<bean id="userService" class="cc.ioit.ioc.service.impl.UserServiceImpl">
+		<property name="PersonService" ref="personService"/>
+	</bean>
+	<bean id="personService" class="cc.ioit.ioc.service.impl.PersonServiceImpl">
+		<property name="UserService" ref="userService"/>
+	</bean>-->
+	<!--<bean name="myBeanPostProcessor" class="cc.ioit.ioc.MyBeanPostProcessor"/>
+	<bean name="myBeanFactoryPostProcessor" class="cc.ioit.ioc.MyBeanFactoryPostProcessor"/>-->
+</beans>

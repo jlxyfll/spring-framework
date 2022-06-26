@@ -139,9 +139,10 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 			throws BeansException {
 
 		super(parent);
-		setConfigLocations(configLocations);
+		setConfigLocations(configLocations);// 根据提供的路径处理成配置文件数组
 		if (refresh) {
-			refresh();
+			refresh();// 核心方法 刷新：1. 销毁原有容器 2. 重新执行初始化操作。
+			// 环境已经准备完毕，这时热加载的话会产生缓存，最简单的方式就是干掉，再通过event事件通知容器中所有的组件，重新获取。
 		}
 	}
 
